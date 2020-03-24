@@ -26,7 +26,7 @@
 static LIST_HEAD(syscon_list);
 
 struct syscon {
-	struct device_node *np;
+	struct device_d *dev;
 	void __iomem *base;
 	struct list_head list;
 	struct regmap *regmap;
@@ -42,6 +42,7 @@ static struct syscon *of_syscon_register(struct device_node *np, bool check_clk)
 {
 	int ret;
 	struct syscon *syscon;
+	struct device_d *dev;
 	struct resource res;
 
 	if (!of_device_is_compatible(np, "syscon"))
@@ -55,12 +56,23 @@ static struct syscon *of_syscon_register(struct device_node *np, bool check_clk)
 	}
 
 	syscon->base = IOMEM(res.start);
-	syscon->np   = np;
+
+	for_each_device(dev) {
+		if (np == dev->device_node) {
+			syscon->dev = dev;
+			break;
+		}
+	}
+
+	if (!syscon->dev) {
+		ret = -ENODEV;
+		goto err_map;
+	}
 
 	list_add_tail(&syscon->list, &syscon_list);
 
-	syscon->regmap = of_regmap_init_mmio_clk(np, NULL, syscon->base,
-					     &syscon_regmap_config);
+	syscon->regmap = regmap_init_mmio_clk(syscon->dev, NULL, syscon->base,
+					      &syscon_regmap_config);
 
 	if (check_clk) {
 		struct clk *clk = of_clk_get(np, 0);
@@ -88,7 +100,7 @@ static struct syscon *node_to_syscon(struct device_node *np)
 	struct syscon *entry, *syscon = NULL;
 
 	list_for_each_entry(entry, &syscon_list, list)
-		if (entry->np == np) {
+		if (entry->dev->device_node == np) {
 			syscon = entry;
 			break;
 		}
