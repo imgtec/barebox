@@ -5,6 +5,7 @@ obj-$(CONFIG_BOARD_DLINK_DIR320) += dlink-dir-320/
 obj-$(CONFIG_BOARD_DPTECHNICS_DPT_MODULE) += dptechnics-dpt-module/
 obj-$(CONFIG_BOARD_OPENEMBEDED_SOM9331) += openembed-som9331/
 obj-$(CONFIG_BOARD_LOONGSON_TECH_LS1B) += loongson-ls1b/
+obj-$(CONFIG_BOARD_LOONGSON2_USELESSROUTER) += loongson2/
 obj-$(CONFIG_BOARD_NETGEAR_WG102) += netgear-wg102/
 obj-$(CONFIG_BOARD_QEMU_MALTA) += qemu-malta/
 obj-$(CONFIG_BOARD_RZX50) += ritmix-rzx50/
